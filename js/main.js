@@ -29,6 +29,25 @@ const game = new Game({
   onGameOver: () => endGame(),
 });
 
+// ===== 보드 크기: 화면 높이에 맞추되 칸 크기는 정수 픽셀로 =====
+const boardCanvas = $('board');
+function fitBoard() {
+  const dpr = window.devicePixelRatio || 1;
+  const mobile = window.matchMedia('(max-width: 860px)').matches;
+  const topbar = document.querySelector('.topbar').offsetHeight;
+  // 상단바 + 보드 테두리/여백 + (모바일) 터치 버튼 영역을 뺀 높이
+  const availH = window.innerHeight - topbar - (mobile ? 190 : 70);
+  const availW = mobile ? window.innerWidth - 60 : Infinity;
+  const cssCell = Math.max(16, Math.min(availH / 20, availW / 10, 48));
+  const cell = Math.max(10, Math.floor(cssCell * dpr)); // 기기 픽셀 단위 칸 크기
+  boardCanvas.width = cell * 10;
+  boardCanvas.height = cell * 20;
+  boardCanvas.style.width = `${(cell * 10) / dpr}px`;
+  boardCanvas.style.height = `${(cell * 20) / dpr}px`;
+}
+fitBoard();
+window.addEventListener('resize', fitBoard);
+
 // ===== HUD =====
 function updateHud() {
   $('score').textContent = game.score.toLocaleString();

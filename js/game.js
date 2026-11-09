@@ -233,7 +233,7 @@ export class Game {
   }
 }
 
-// ===== 렌더링 (픽셀 아트: 캔버스 1px = 화면 3px) =====
+// ===== 렌더링 (픽셀 아트: 블록 한 칸 = 10x10 도트, 도트 크기는 칸 크기에 비례) =====
 function shade(hex, amt) {
   const n = parseInt(hex.slice(1), 16);
   const r = Math.min(255, Math.max(0, (n >> 16) + amt));
@@ -244,33 +244,35 @@ function shade(hex, amt) {
 
 // 블록 한 칸: 어두운 외곽선 + 밝은 위/왼쪽 + 어두운 아래/오른쪽 + 반짝이 점
 export function drawCell(ctx, x, y, size, color) {
+  const u = Math.max(1, Math.floor(size / 10)); // 도트 1개 크기 (정수)
   const px = x * size;
   const py = y * size;
   ctx.fillStyle = shade(color, -110);
   ctx.fillRect(px, py, size, size);
   ctx.fillStyle = color;
-  ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
+  ctx.fillRect(px + u, py + u, size - 2 * u, size - 2 * u);
   ctx.fillStyle = shade(color, 60);
-  ctx.fillRect(px + 1, py + 1, size - 2, 1);
-  ctx.fillRect(px + 1, py + 1, 1, size - 2);
+  ctx.fillRect(px + u, py + u, size - 2 * u, u);
+  ctx.fillRect(px + u, py + u, u, size - 2 * u);
   ctx.fillStyle = shade(color, -55);
-  ctx.fillRect(px + 1, py + size - 2, size - 2, 1);
-  ctx.fillRect(px + size - 2, py + 1, 1, size - 2);
+  ctx.fillRect(px + u, py + size - 2 * u, size - 2 * u, u);
+  ctx.fillRect(px + size - 2 * u, py + u, u, size - 2 * u);
   if (size >= 8) {
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(px + 2, py + 2, 2, 1);
-    ctx.fillRect(px + 2, py + 3, 1, 1);
+    ctx.fillRect(px + 2 * u, py + 2 * u, 2 * u, u);
+    ctx.fillRect(px + 2 * u, py + 3 * u, u, u);
   }
 }
 
 export function renderBoard(ctx, game) {
-  const size = ctx.canvas.width / COLS;
+  const size = Math.floor(ctx.canvas.width / COLS);
+  const u = Math.max(1, Math.floor(size / 10));
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   // 격자 대신 칸 모서리에 작은 점
   ctx.fillStyle = 'rgba(255,214,231,0.14)';
   for (let y = 1; y < ROWS; y++) {
-    for (let x = 1; x < COLS; x++) ctx.fillRect(x * size, y * size, 1, 1);
+    for (let x = 1; x < COLS; x++) ctx.fillRect(x * size, y * size, u, u);
   }
 
   const clearRows = game.clearing ? game.clearing.rows : [];
