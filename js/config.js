@@ -3,5 +3,5 @@
 // anon(public) 키는 브라우저에 노출되어도 되는 공개 키입니다. 접근 제어는 RLS 정책으로 합니다.
 // ⚠️ service_role 키는 절대 여기에 넣지 마세요.
 
-export const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-export const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+export const SUPABASE_URL = 'https://uunvbhydzhauiuuosqmh.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_TQ05OTpKkPgdCXUgCWvklw_-aB7BgZU'; // publishable 키 (공개용)
