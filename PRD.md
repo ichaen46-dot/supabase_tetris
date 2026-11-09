@@ -135,6 +135,7 @@
 - **성능**: requestAnimationFrame 기반, 60fps 목표
 - **호환성**: 최신 Chrome, Edge, Safari, Firefox / 모바일 브라우저
 - **반응형**: 860px 이하에서 세로 배치 + 터치 컨트롤
+- **디자인**: 레트로 픽셀 테마. 한글 픽셀 폰트(Galmuri), RPG 대화창 스타일 패널, 주사선이 있는 CRT 느낌 보드. 캔버스는 저해상도(100×200)를 정수배로 확대해 픽셀이 선명하게 보이도록 함
 - **보안**: 브라우저에는 anon(public) 키만 둔다. service_role 키는 절대 쓰지 않는다. RLS로 조회(SELECT)와 추가(INSERT)만 허용하고, 수정·삭제는 막는다. 값의 범위는 DB 제약조건으로 검증한다.
 - **용량**: 외부 음원·이미지 파일 없음. 외부 의존성은 Supabase JS(CDN)와 Google Fonts뿐.
 

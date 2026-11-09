@@ -233,7 +233,7 @@ export class Game {
   }
 }
 
-// ===== 렌더링 =====
+// ===== 렌더링 (픽셀 아트: 캔버스 1px = 화면 3px) =====
 function shade(hex, amt) {
   const n = parseInt(hex.slice(1), 16);
   const r = Math.min(255, Math.max(0, (n >> 16) + amt));
@@ -242,42 +242,47 @@ function shade(hex, amt) {
   return `rgb(${r},${g},${b})`;
 }
 
-export function drawCell(ctx, x, y, size, color, alpha = 1) {
-  ctx.globalAlpha = alpha;
+// 블록 한 칸: 어두운 외곽선 + 밝은 위/왼쪽 + 어두운 아래/오른쪽 + 반짝이 점
+export function drawCell(ctx, x, y, size, color) {
   const px = x * size;
   const py = y * size;
+  ctx.fillStyle = shade(color, -110);
+  ctx.fillRect(px, py, size, size);
   ctx.fillStyle = color;
   ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
-  ctx.fillStyle = shade(color, 45);
-  ctx.fillRect(px + 1, py + 1, size - 2, 4);
-  ctx.fillStyle = shade(color, -50);
-  ctx.fillRect(px + 1, py + size - 5, size - 2, 4);
-  ctx.globalAlpha = 1;
+  ctx.fillStyle = shade(color, 60);
+  ctx.fillRect(px + 1, py + 1, size - 2, 1);
+  ctx.fillRect(px + 1, py + 1, 1, size - 2);
+  ctx.fillStyle = shade(color, -55);
+  ctx.fillRect(px + 1, py + size - 2, size - 2, 1);
+  ctx.fillRect(px + size - 2, py + 1, 1, size - 2);
+  if (size >= 8) {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(px + 2, py + 2, 2, 1);
+    ctx.fillRect(px + 2, py + 3, 1, 1);
+  }
 }
 
 export function renderBoard(ctx, game) {
   const size = ctx.canvas.width / COLS;
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-  // 격자
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  ctx.lineWidth = 1;
-  for (let x = 1; x < COLS; x++) {
-    ctx.beginPath(); ctx.moveTo(x * size + 0.5, 0); ctx.lineTo(x * size + 0.5, ROWS * size); ctx.stroke();
-  }
+  // 격자 대신 칸 모서리에 작은 점
+  ctx.fillStyle = 'rgba(243,229,192,0.10)';
   for (let y = 1; y < ROWS; y++) {
-    ctx.beginPath(); ctx.moveTo(0, y * size + 0.5); ctx.lineTo(COLS * size, y * size + 0.5); ctx.stroke();
+    for (let x = 1; x < COLS; x++) ctx.fillRect(x * size, y * size, 1, 1);
   }
 
   const clearRows = game.clearing ? game.clearing.rows : [];
-  const flash = game.clearing ? game.clearing.t / 280 : 0;
+  // 지워지는 줄: 70ms 간격으로 깜빡임
+  const blinkOn = game.clearing ? Math.floor(game.clearing.t / 70) % 2 === 0 : false;
 
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       const t = game.grid[y][x];
       if (!t) continue;
       if (clearRows.includes(y)) {
-        drawCell(ctx, x, y, size, '#ffffff', 1 - flash);
+        if (blinkOn) drawCell(ctx, x, y, size, '#f3e5c0');
       } else {
         drawCell(ctx, x, y, size, COLORS[t]);
       }
@@ -292,7 +297,7 @@ export function renderBoard(ctx, game) {
   }
 }
 
-export function renderMini(ctx, types, size = 24, gap = 12) {
+export function renderMini(ctx, types, size = 8, gap = 5) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   const list = Array.isArray(types) ? types : [types];
   let oy = gap;
@@ -304,10 +309,10 @@ export function renderMini(ctx, types, size = 24, gap = 12) {
     shape.forEach((r, y) => r.forEach((v, x) => {
       if (v) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
     }));
-    const s = idx === 0 ? size : size * 0.75;
+    const s = idx === 0 ? size : Math.round(size * 0.75);
     const w = (maxX - minX + 1) * s;
     const h = (maxY - minY + 1) * s;
-    const ox = (ctx.canvas.width - w) / 2;
+    const ox = Math.round((ctx.canvas.width - w) / 2);
     ctx.save();
     ctx.translate(ox, oy);
     shape.forEach((r, y) => r.forEach((v, x) => {

@@ -35,7 +35,7 @@ function updateHud() {
   $('lines').textContent = game.lines;
   $('level').textContent = game.level;
   renderMini(nextCtx, game.queue);
-  renderMini(holdCtx, game.hold, 24, (120 - 48) / 2);
+  renderMini(holdCtx, game.hold, 8, 12);
 }
 
 function showOverlay(which) {

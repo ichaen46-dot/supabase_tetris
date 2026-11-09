@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>STACKFALL · 블록 퍼즐</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">STACK<span>FALL</span></h1>
+    <h1 class="logo">STACKFALL</h1>
     <div class="topbar-actions">
       <button id="btn-mute" class="chip" title="소리 켜기/끄기 (M)">🔊 소리</button>
       <span id="db-status" class="chip chip-muted">DB 확인 중…</span>
@@ -22,8 +20,8 @@
     <!-- 왼쪽: 홀드 + 정보 -->
     <aside class="panel side">
       <section class="card">
-        <h2>HOLD <small>(C)</small></h2>
-        <canvas id="hold" width="120" height="120"></canvas>
+        <h2>홀드 <small>C</small></h2>
+        <canvas id="hold" width="40" height="40"></canvas>
       </section>
       <section class="card stats">
         <div><label>점수</label><strong id="score">0</strong></div>
@@ -45,19 +43,20 @@
 
     <!-- 가운데: 보드 -->
     <section class="board-wrap">
-      <canvas id="board" width="300" height="600"></canvas>
+      <canvas id="board" width="100" height="200"></canvas>
       <div id="overlay" class="overlay">
         <div class="overlay-box" id="overlay-start">
-          <h2>STACKFALL</h2>
-          <p>줄을 채워 블록을 지우세요.</p>
-          <button id="btn-start" class="btn primary">게임 시작</button>
+          <h2 class="title">STACK<br />FALL</h2>
+          <p>가로줄을 채우면 블록이 사라져요.</p>
+          <button id="btn-start" class="btn primary blink">▶ 게임 시작</button>
+          <p class="hint">Enter 키로도 시작할 수 있어요</p>
         </div>
         <div class="overlay-box hidden" id="overlay-pause">
           <h2>일시정지</h2>
           <button id="btn-resume" class="btn primary">계속하기</button>
         </div>
         <div class="overlay-box hidden" id="overlay-over">
-          <h2>GAME OVER</h2>
+          <h2>게임 오버</h2>
           <p class="final">점수 <strong id="final-score">0</strong></p>
           <form id="score-form">
             <input id="nickname" maxlength="20" placeholder="닉네임 (최대 20자)" required autocomplete="off" />
@@ -72,11 +71,11 @@
     <!-- 오른쪽: 다음 블록 + 랭킹 -->
     <aside class="panel side">
       <section class="card">
-        <h2>NEXT</h2>
-        <canvas id="next" width="120" height="300"></canvas>
+        <h2>다음 블록</h2>
+        <canvas id="next" width="40" height="100"></canvas>
       </section>
       <section class="card">
-        <h2>TOP 10 <button id="btn-refresh" class="link" title="새로고침">↻</button></h2>
+        <h2>랭킹 TOP 10 <button id="btn-refresh" class="link" title="새로고침">↻</button></h2>
         <ol id="leaderboard" class="leaderboard"><li class="empty">불러오는 중…</li></ol>
       </section>
     </aside>
@@ -117,7 +116,7 @@
     </div>
   </section>
 
-  <footer class="foot">STACKFALL · Supabase + Vercel</footer>
+  <footer class="foot">STACKFALL 2026</footer>
 
   <script type="module" src="js/main.js"></script>
 </body>
