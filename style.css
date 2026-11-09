@@ -20,6 +20,7 @@
   --px: 3px;            /* 픽셀 1칸 크기 (캔버스 3배 확대와 맞춤) */
   --font: 'Galmuri11', 'Galmuri9', monospace;
   --font-big: 'Galmuri14', 'Galmuri11', monospace;
+  --font-title: 'Galmuri11', monospace; /* 700 = 픽셀 볼드 */
 }
 
 * { box-sizing: border-box; }
@@ -74,8 +75,10 @@ textarea { resize: vertical; }
 }
 .logo {
   margin: 0;
-  font-family: var(--font-big);
-  font-size: 28px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.2;
   letter-spacing: 2px;
   color: var(--coin);
   /* 계단식 픽셀 입체 글자 */
@@ -181,14 +184,14 @@ kbd {
 .overlay-box { text-align: center; padding: 18px; width: 100%; }
 .overlay-box h2 {
   margin: 0 0 12px;
-  font-family: var(--font-big);
-  font-weight: normal;
-  font-size: 28px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 36px;
   line-height: 1.25;
   color: var(--coin);
   text-shadow: 3px 3px 0 var(--coin-dark);
 }
-.overlay-box h2.title { font-size: 42px; letter-spacing: 3px; text-shadow: 3px 3px 0 var(--coin-dark), 6px 6px 0 #2a1026; }
+.overlay-box h2.title { font-size: 48px; letter-spacing: 3px; text-shadow: 3px 3px 0 var(--coin-dark), 6px 6px 0 #2a1026; }
 .overlay-box p { color: #f2bcd2; margin: 0 0 18px; }
 .overlay .msg.ok { color: #8ff0d8; }
 .overlay .msg.err { color: #ffb3c0; }
@@ -276,7 +279,8 @@ kbd {
   #hold { width: 80px; height: 80px; }
   #next { width: 80px; height: 200px; }
   .board-wrap { order: -1; }
-  .overlay-box h2.title { font-size: 28px; }
+  .overlay-box h2.title { font-size: 36px; }
+  .logo { font-size: 24px; }
   .feedback { grid-template-columns: 1fr; }
   .touch {
     display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
