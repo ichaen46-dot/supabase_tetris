@@ -1,7 +1,8 @@
 -- STACKFALL Supabase 스키마
--- Supabase 대시보드 → SQL Editor 에 붙여넣고 실행하세요. (여러 번 실행해도 안전)
+-- 사용법: Supabase 대시보드 → SQL Editor → New query → 전체 붙여넣기 → Run
+-- 여러 번 실행해도 안전합니다. (DROP 문이 없어 "destructive operation" 경고가 뜨지 않습니다)
 
--- ===== 점수 =====
+-- ===== 1. 점수 테이블 =====
 create table if not exists public.scores (
   id          bigint generated always as identity primary key,
   nickname    text        not null check (char_length(btrim(nickname)) between 1 and 20),
@@ -13,7 +14,7 @@ create table if not exists public.scores (
 
 create index if not exists scores_rank_idx on public.scores (score desc, created_at asc);
 
--- ===== 피드백 =====
+-- ===== 2. 피드백 테이블 =====
 create table if not exists public.feedback (
   id          bigint generated always as identity primary key,
   nickname    text        not null check (char_length(btrim(nickname)) between 1 and 20),
@@ -24,20 +25,26 @@ create table if not exists public.feedback (
 
 create index if not exists feedback_created_idx on public.feedback (created_at desc);
 
--- ===== RLS: 조회와 추가만 허용 (수정/삭제 정책 없음 = 차단) =====
+-- ===== 3. 보안(RLS): 누구나 조회·추가만 가능, 수정·삭제는 불가 =====
 alter table public.scores   enable row level security;
 alter table public.feedback enable row level security;
 
-drop policy if exists "scores_select" on public.scores;
-drop policy if exists "scores_insert" on public.scores;
-drop policy if exists "feedback_select" on public.feedback;
-drop policy if exists "feedback_insert" on public.feedback;
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'scores' and policyname = 'scores_select') then
+    create policy scores_select on public.scores for select to anon, authenticated using (true);
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'scores' and policyname = 'scores_insert') then
+    create policy scores_insert on public.scores for insert to anon, authenticated with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'feedback' and policyname = 'feedback_select') then
+    create policy feedback_select on public.feedback for select to anon, authenticated using (true);
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'feedback' and policyname = 'feedback_insert') then
+    create policy feedback_insert on public.feedback for insert to anon, authenticated with check (true);
+  end if;
+end $$;
 
-create policy "scores_select"   on public.scores   for select to anon, authenticated using (true);
-create policy "scores_insert"   on public.scores   for insert to anon, authenticated with check (true);
-create policy "feedback_select" on public.feedback for select to anon, authenticated using (true);
-create policy "feedback_insert" on public.feedback for insert to anon, authenticated with check (true);
-
--- 테이블 권한 (Data API 노출)
+-- ===== 4. API 접근 권한 =====
 grant select, insert on public.scores   to anon, authenticated;
 grant select, insert on public.feedback to anon, authenticated;
