@@ -276,10 +276,14 @@ $('score-form').addEventListener('submit', async (e) => {
   btn.disabled = true;
   setMsg($('save-msg'), '저장 중…');
   try {
-    await db.saveScore({ nickname, score: game.score, lines: game.lines, level: game.level });
+    const { bestScore, isNewBest } = await db.saveScore({ nickname, score: game.score, lines: game.lines, level: game.level });
     scoreSaved = true;
     localStorage.setItem('sf_nick', nickname);
-    setMsg($('save-msg'), '저장되었습니다! 🎉', 'ok');
+    if (isNewBest) {
+      setMsg($('save-msg'), '최고 기록으로 저장했어요! 🎉', 'ok');
+    } else {
+      setMsg($('save-msg'), `${nickname}님의 최고 기록 ${bestScore.toLocaleString()}점이 그대로 유지돼요.`, 'ok');
+    }
     sound.play('click');
     loadLeaderboard();
   } catch (err) {

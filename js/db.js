@@ -33,10 +33,19 @@ export async function fetchTopScores(limit = 10) {
   return data;
 }
 
+// 같은 닉네임이면 더 높은 점수일 때만 갱신 (DB 함수 submit_score)
+// 반환: { bestScore: 저장된 최고 점수, isNewBest: 이번 점수로 갱신/신규 등록됐는지 }
 export async function saveScore({ nickname, score, lines, level }) {
   await ensure();
-  const { error } = await supabase.from('scores').insert({ nickname, score, lines, level });
+  const { data, error } = await supabase.rpc('submit_score', {
+    p_nickname: nickname,
+    p_score: score,
+    p_lines: lines,
+    p_level: level,
+  });
   if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return { bestScore: row?.best_score ?? score, isNewBest: row?.is_new_best ?? true };
 }
 
 export async function fetchFeedback(limit = 20) {

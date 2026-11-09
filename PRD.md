@@ -99,8 +99,8 @@
 | ID | 요구사항 |
 |---|---|
 | F2-1 | 게임 오버 화면에 최종 점수와 닉네임 입력창(1~20자)을 표시 |
-| F2-2 | "점수 저장"을 누르면 `scores` 테이블에 닉네임, 점수, 줄 수, 레벨을 저장 |
-| F2-3 | 한 판에 한 번만 저장(중복 제출 방지) |
+| F2-2 | "점수 저장"을 누르면 닉네임, 점수, 줄 수, 레벨을 저장한다. **닉네임당 기록은 1개**: 처음 쓰는 닉네임이면 새로 추가하고, 이미 있는 닉네임이면 이번 점수가 더 높을 때만 갱신한다 |
+| F2-3 | 한 판에 한 번만 저장(중복 제출 방지). 저장 후 최고 기록 갱신 여부를 알려준다(갱신 시 "최고 기록으로 저장했어요!", 아니면 기존 최고 점수 안내) |
 | F2-4 | 저장에 성공하면 랭킹을 자동 새로고침 |
 | F2-5 | 랭킹 TOP 10: 점수 내림차순, 같은 점수면 먼저 기록한 사람이 위 |
 | F2-6 | 마지막에 쓴 닉네임은 브라우저(localStorage)에 기억 |
@@ -154,7 +154,8 @@
 │   ├── audio.js        # Web Audio BGM / 효과음 합성
 │   ├── db.js           # Supabase 클라이언트 (동적 import)
 │   └── config.js       # Supabase URL / anon key
-├── supabase/schema.sql # 테이블 + RLS 정책
+├── supabase/schema.sql # 테이블 + 함수 + RLS 정책 (초기화 후 재설치용)
+├── supabase/migrations/ # 운영 중인 DB 업데이트용 SQL
 ├── vercel.json
 └── README.md           # 설정·배포 가이드
 ```
@@ -165,11 +166,11 @@
 | 컬럼 | 타입 | 제약 |
 |---|---|---|
 | id | bigint identity | PK |
-| nickname | text | 1~20자 |
-| score | integer | 0 이상, 1억 미만 |
+| nickname | text | 1~20자, **UNIQUE** |
+| score | integer | 0 이상, 1억 미만 (해당 닉네임의 최고 점수) |
 | lines | integer | 0 이상 |
 | level | integer | 1 이상 |
-| created_at | timestamptz | 기본값 now() |
+| created_at | timestamptz | 최고 기록을 세운 시각 |
 
 **feedback**
 | 컬럼 | 타입 | 제약 |
@@ -180,7 +181,9 @@
 | message | text | 1~500자 |
 | created_at | timestamptz | 기본값 now() |
 
-**RLS 정책**: 두 테이블 모두 `anon`과 `authenticated`에 SELECT와 INSERT만 허용한다. UPDATE와 DELETE 정책은 만들지 않는다(= 차단).
+**점수 등록 함수** `submit_score(p_nickname, p_score, p_lines, p_level)`: `INSERT ... ON CONFLICT (nickname) DO UPDATE ... WHERE 새 점수 > 기존 점수`로 처리하고, `(best_score, is_new_best)`를 반환한다. `security definer`로 실행되므로 브라우저에 UPDATE 권한을 열지 않아도 된다.
+
+**RLS 정책**: `scores`는 누구나 SELECT만 할 수 있고, 등록은 `submit_score` 함수로만 한다(직접 INSERT·UPDATE·DELETE 불가). `feedback`은 SELECT와 INSERT만 허용하고 UPDATE·DELETE는 막는다.
 
 ### 6.3 배포 흐름
 1. Supabase 프로젝트 생성 → SQL Editor에서 `supabase/schema.sql` 실행
