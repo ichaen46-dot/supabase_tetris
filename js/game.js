@@ -14,13 +14,13 @@ const SHAPES = {
 };
 
 export const COLORS = {
-  I: '#5ee0c0',
-  O: '#ffd166',
-  T: '#c792ea',
-  S: '#8bd450',
-  Z: '#ff6b7a',
-  J: '#5c9dff',
-  L: '#ffa24c',
+  I: '#8ee6d6', // 민트
+  O: '#ffe28a', // 레몬
+  T: '#d2b8f7', // 라벤더
+  S: '#bde59a', // 연두
+  Z: '#ff9fb2', // 핑크
+  J: '#a3c6ff', // 하늘
+  L: '#ffc79a', // 살구
 };
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
@@ -268,7 +268,7 @@ export function renderBoard(ctx, game) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   // 격자 대신 칸 모서리에 작은 점
-  ctx.fillStyle = 'rgba(243,229,192,0.10)';
+  ctx.fillStyle = 'rgba(255,214,231,0.14)';
   for (let y = 1; y < ROWS; y++) {
     for (let x = 1; x < COLS; x++) ctx.fillRect(x * size, y * size, 1, 1);
   }
@@ -282,7 +282,7 @@ export function renderBoard(ctx, game) {
       const t = game.grid[y][x];
       if (!t) continue;
       if (clearRows.includes(y)) {
-        if (blinkOn) drawCell(ctx, x, y, size, '#f3e5c0');
+        if (blinkOn) drawCell(ctx, x, y, size, '#fff4f8');
       } else {
         drawCell(ctx, x, y, size, COLORS[t]);
       }
